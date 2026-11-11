@@ -29,6 +29,7 @@ header{display:flex;justify-content:space-between;align-items:center;padding:18p
 .step h2{font-size:22px;margin-bottom:12px}
 .step h2 small{display:block;font:400 14px "DM Sans",sans-serif;color:var(--muted);margin-top:4px}
 .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#servs{grid-template-columns:repeat(2,1fr)}
 .chip,.tab{background:var(--surface);border:2px solid var(--line);color:var(--text);border-radius:14px;padding:14px 8px;font:700 15px "DM Sans",sans-serif;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:border-color .2s,background .2s,transform .15s}
 .chip:active,.tab:active,.pkg:active{transform:scale(.97)}
 .chip i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font:800 16px "Bricolage Grotesque",sans-serif;font-style:normal;color:#fff}
@@ -108,7 +109,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;word-break:break-all}
 <h2>3. Elegí el paquete <small id="hint"></small></h2>
 <div class="toggle" id="gar" hidden>
 <button type="button" data-g="0" class="on">Sin garantía</button>
-<button type="button" data-g="1">Con garantía</button>
+<button type="button" data-g="1">Con garantía (30 días)</button>
 </div>
 <div class="grid" id="pkgs"></div>
 </section>
@@ -122,7 +123,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;word-break:break-all}
 <section class="notes">
 <div class="note"><h3>Tiempos de entrega</h3><p>Lo normal es que tu pedido llegue en menos de 24 horas. En momentos de mucha demanda puede demorar hasta 72 horas. Si tenés dudas, escribinos por WhatsApp y te contamos cómo va.</p></div>
 <div class="note"><h3>Sin reembolsos</h3><p>Una vez realizado el pago no hacemos devoluciones. Revisá bien el link y el paquete antes de finalizar la compra.</p></div>
-<div class="note"><h3>Garantía en seguidores</h3><p>Solo los seguidores se ofrecen con garantía: si bajan durante el período cubierto, los reponemos. Los likes y las vistas se venden sin garantía.</p></div>
+<div class="note"><h3>Garantía en seguidores</h3><p>La garantía dura 30 días: si tus seguidores bajan durante ese período, los reponemos. Solo los seguidores se ofrecen con garantía; los likes y las vistas se venden sin garantía. Las promos de seguidores ya la incluyen.</p></div>
 </section>
 
 <section class="step">
@@ -162,22 +163,24 @@ var PRECIOS = {
     con: [[500,4999],[1000,6999],[2500,13999],[5000,27999],[10000,55999]]
   },
   Likes: [[500,1999],[1000,2999],[2500,4999],[5000,6999]],
-  Vistas: [[10000,2999],[30000,7999],[50000,12999],[100000,19999]]
+  Vistas: [[10000,2999],[30000,7999],[50000,12999],[100000,19999]],
+  Promos: [[10000,49999],[30000,99999],[50000,139999],[75000,179999],[100000,249999]]
 };
-var MAS_VENDIDO = {Seguidores:1000, Likes:1000, Vistas:30000};
+var MAS_VENDIDO = {Seguidores:1000, Likes:1000, Vistas:30000, Promos:30000};
 /* ============================== */
 
 var st = {plat:"Instagram", serv:"Seguidores", gar:0, pkg:null};
 var $ = function(id){return document.getElementById(id)};
 var money = function(n){return "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")};
 var qty = function(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")};
-var LINKS = {Seguidores:"Link de tu perfil", Likes:"Link de la publicación", Vistas:"Link del video o publicación"};
+var LINKS = {Seguidores:"Link de tu perfil", Likes:"Link de la publicación", Vistas:"Link del video o publicación", Promos:"Link de tu perfil"};
 var ICON = {
   Instagram:"<svg viewBox='0 0 24 24' fill='none' stroke='#fff' stroke-width='2' aria-hidden='true'><rect x='3' y='3' width='18' height='18' rx='5'/><circle cx='12' cy='12' r='4'/><circle cx='17.5' cy='6.5' r='1.1' fill='#fff' stroke='none'/></svg>",
   TikTok:"<svg viewBox='0 0 24 24' fill='#fff' aria-hidden='true'><path d='M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z'/></svg>",
   Facebook:"<svg viewBox='0 0 24 24' fill='#fff' aria-hidden='true'><path d='M14 8V6.5c0-.7.2-1 1.1-1H17V2h-2.7C11.2 2 10 3.8 10 6.2V8H8v3.5h2V22h4V11.5h2.7L17 8h-3z'/></svg>"
 };
 
+function nm(){ return st.serv==="Promos" ? "seguidores" : st.serv.toLowerCase(); }
 function list(){
   var p = PRECIOS[st.serv];
   return st.serv==="Seguidores" ? (st.gar ? p.con : p.sin) : p;
@@ -194,26 +197,26 @@ function renderPlats(){
   }).join("");
 }
 function renderServs(){
-  $("servs").innerHTML = ["Seguidores","Likes","Vistas"].map(function(s){
+  $("servs").innerHTML = ["Seguidores","Likes","Vistas","Promos"].filter(function(s){ return !(s==="Promos" && st.plat==="TikTok"); }).map(function(s){
     return '<button type="button" class="tab '+(st.serv===s?'on':'')+'" data-v="'+s+'">'+s+'</button>';
   }).join("");
 }
 function renderPkgs(){
   $("gar").hidden = st.serv!=="Seguidores";
-  $("hint").textContent = st.serv==="Seguidores" ? "Con garantía reponemos si bajan." : "Este servicio no incluye garantía. Precio igual para las tres plataformas.";
+  $("hint").textContent = st.serv==="Promos" ? "Seguidores con garantía de 30 días incluida. Solo Instagram y Facebook." : st.serv==="Seguidores" ? "Con garantía (30 días) reponemos si bajan." : "Este servicio no incluye garantía. Precio igual para las tres plataformas.";
   $("linkTitle").textContent = "4. " + LINKS[st.serv] + " de " + st.plat;
   $("pkgs").innerHTML = list().map(function(x){
     var on = st.pkg===x[0];
     return '<button type="button" class="pkg '+(on?'on':'')+'" data-q="'+x[0]+'">'+
       (MAS_VENDIDO[st.serv]===x[0]?'<em class="tag" style="font-style:normal">Más vendido</em>':'')+
-      '<b>'+qty(x[0])+'</b><span>'+st.serv.toLowerCase()+'</span><strong>'+money(x[1])+'</strong></button>';
+      '<b>'+qty(x[0])+'</b><span>'+nm()+'</span><strong>'+money(x[1])+'</strong></button>';
   }).join("");
   renderBar();
 }
 function renderBar(){
   var c = current();
   $("barTot").textContent = c ? money(c[1]) : "$0";
-  $("barInfo").textContent = c ? qty(c[0])+" "+st.serv.toLowerCase()+" · "+st.plat : "Elegí un paquete";
+  $("barInfo").textContent = c ? qty(c[0])+" "+nm()+" · "+st.plat : "Elegí un paquete";
 }
 function pick(group, el, key){
   var btns = $(group).children;
@@ -222,7 +225,7 @@ function pick(group, el, key){
 }
 $("plats").onclick = function(e){
   var b = e.target.closest(".chip"); if(!b) return;
-  st.plat = b.dataset.v; renderPlats(); renderPkgs();
+  st.plat = b.dataset.v; if(st.plat==="TikTok" && st.serv==="Promos"){ st.serv = "Seguidores"; st.pkg = null; } renderPlats(); renderServs(); renderPkgs();
 };
 $("servs").onclick = function(e){
   var b = e.target.closest(".tab"); if(!b) return;
@@ -245,8 +248,8 @@ $("link").oninput = function(){ this.classList.remove("err"); $("msg").textConte
 
 function detalle(){
   var c = current();
-  var s = qty(c[0]) + " " + st.serv.toLowerCase();
-  if(st.serv==="Seguidores") s += st.gar ? " (con garantía)" : " (sin garantía)";
+  var s = qty(c[0]) + " " + nm();
+  if(st.serv==="Promos") s += " (promo, con garantía de 30 días)"; else if(st.serv==="Seguidores") s += st.gar ? " (con garantía de 30 días)" : " (sin garantía)";
   return s;
 }
 $("finish").onclick = function(){

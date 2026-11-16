@@ -128,7 +128,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;word-break:break-all}
 
 <section class="step">
 <h2>Preguntas frecuentes</h2>
-<details><summary>¿Cómo pago?</summary><p>Por transferencia al alias vexo.agencia.ar. Al finalizar la compra ves el total exacto y un botón para copiar el alias.</p></details>
+<details><summary>¿Cómo pago?</summary><p>Por transferencia a cualquiera de nuestros alias: vexo.agencia.ar o vexo.agencia.es. Al finalizar la compra ves el total exacto y un botón para copiar cada alias.</p></details>
 <details><summary>¿Necesitan mi contraseña?</summary><p>No. Solo necesitamos el link de tu perfil o publicación. Tu cuenta tiene que estar en modo público.</p></details>
 <details><summary>¿Cómo envío el comprobante?</summary><p>Al tocar “Enviar pedido por WhatsApp” se arma el mensaje con tu pedido. Después adjuntás el comprobante en ese mismo chat.</p></details>
 </section>
@@ -147,8 +147,8 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;word-break:break-all}
 <h2 id="mt">Tu pedido</h2>
 <dl id="sum"></dl>
 <div class="big"><small>Total a transferir</small><div id="mTot"></div></div>
-<div class="alias"><div><small>Alias para transferir</small><b id="aliasTxt"></b></div><button class="btn ghost" id="copy" type="button" style="width:auto;margin:0">Copiar</button></div>
-<p class="warn">Entrega habitual en menos de 24 hs, con posible demora de hasta 72 hs por demanda. No se realizan reembolsos.</p>
+<div id="aliases"></div>
+<p class="warn">Transferí a cualquiera de los dos alias. Entrega habitual en menos de 24 hs, con posible demora de hasta 72 hs por demanda. No se realizan reembolsos.</p>
 <a class="btn wa" id="wa" href="#" target="_blank" rel="noopener">Enviar pedido por WhatsApp</a>
 <button class="btn ghost" id="close" type="button">Volver y editar</button>
 </div></div>
@@ -156,7 +156,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;word-break:break-all}
 <script>
 /* ====== DATOS EDITABLES ====== */
 var WHATSAPP = "5493426312752";
-var ALIAS = "vexo.agencia.ar";
+var ALIASES = ["vexo.agencia.ar", "vexo.agencia.es"];
 var PRECIOS = {
   Seguidores: {
     sin: [[500,2999],[1000,4999],[2500,9999],[5000,23999],[10000,46999]],
@@ -252,6 +252,14 @@ function detalle(){
   if(st.serv==="Promos") s += " (promo, con garantía de 30 días)"; else if(st.serv==="Seguidores") s += st.gar ? " (con garantía de 30 días)" : " (sin garantía)";
   return s;
 }
+function renderAliases(){
+  $("aliases").innerHTML = ALIASES.map(function(a,i){
+    return '<div class="alias"><div><small>Alias '+(i+1)+' para transferir</small><b></b></div>'+
+      '<button class="btn ghost copy" type="button" data-i="'+i+'" style="width:auto;margin:0">Copiar</button></div>';
+  }).join("");
+  var bs = $("aliases").getElementsByTagName("b");
+  for(var i=0;i<bs.length;i++) bs[i].textContent = ALIASES[i];
+}
 $("finish").onclick = function(){
   var c = current(), l = $("link").value.trim();
   if(!c){ $("msg").textContent = "Elegí un paquete para continuar."; $("paquetes").scrollIntoView({behavior:"smooth"}); return; }
@@ -259,24 +267,25 @@ $("finish").onclick = function(){
   $("sum").innerHTML = "<dt>Plataforma</dt><dd>"+st.plat+"</dd><dt>Servicio</dt><dd>"+detalle()+"</dd><dt>Link</dt><dd></dd>";
   $("sum").lastChild.textContent = l;
   $("mTot").textContent = money(c[1]);
-  $("aliasTxt").textContent = ALIAS;
+  renderAliases();
   var texto = "¡Hola! Quiero hacer un pedido 👋\n\n" +
     "📱 Plataforma: " + st.plat + "\n" +
     "🛒 Servicio: " + detalle() + "\n" +
     "🔗 Link: " + l + "\n" +
     "💰 Total a pagar: " + money(c[1]) + "\n\n" +
-    "Ya realicé la transferencia al alias " + ALIAS + ". Les envío el comprobante a continuación 👇";
+    "Ya realicé la transferencia a uno de los alias (" + ALIASES.join(" / ") + "). Les envío el comprobante a continuación 👇";
   $("wa").href = "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(texto);
   $("modal").classList.add("open");
 };
 $("close").onclick = function(){ $("modal").classList.remove("open"); };
 $("modal").onclick = function(e){ if(e.target===this) this.classList.remove("open"); };
 document.onkeydown = function(e){ if(e.key==="Escape") $("modal").classList.remove("open"); };
-$("copy").onclick = function(){
-  var b = this;
+$("aliases").onclick = function(e){
+  var b = e.target.closest(".copy"); if(!b) return;
+  var txt = ALIASES[+b.dataset.i];
   var done = function(){ b.textContent = "¡Copiado!"; setTimeout(function(){ b.textContent = "Copiar"; }, 1800); };
-  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(ALIAS).then(done, done); }
-  else { var t = document.createElement("textarea"); t.value = ALIAS; document.body.appendChild(t); t.select(); try{document.execCommand("copy")}catch(x){} t.remove(); done(); }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done, done); }
+  else { var t = document.createElement("textarea"); t.value = txt; document.body.appendChild(t); t.select(); try{document.execCommand("copy")}catch(x){} t.remove(); done(); }
 };
 renderPlats(); renderServs(); renderPkgs();
 </script>

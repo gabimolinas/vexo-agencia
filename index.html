@@ -129,7 +129,7 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;word-break:break-all}
 <section class="notes">
 <div class="note"><h3>Tiempos de entrega</h3><p>Lo normal es que tu pedido llegue en menos de 24 horas. En momentos de mucha demanda puede demorar hasta 72 horas. Si tenés dudas, escribinos por WhatsApp y te contamos cómo va.</p></div>
 <div class="note"><h3>Sin reembolsos</h3><p>Una vez realizado el pago no hacemos devoluciones. Revisá bien el link y el paquete antes de finalizar la compra.</p></div>
-<div class="note"><h3>Garantía en seguidores</h3><p>La garantía dura 30 días: si tus seguidores bajan durante ese período, los reponemos. Solo los seguidores se ofrecen con garantía; los suscriptores y espectadores en vivo de YouTube, los likes y las vistas se venden sin garantía. Las promos de seguidores ya la incluyen.</p></div>
+<div class="note"><h3>Garantía en seguidores</h3><p>La garantía dura 30 días: si tus seguidores bajan durante ese período, los reponemos. Solo los seguidores se ofrecen con garantía; los suscriptores y espectadores en vivo de YouTube, los likes y las vistas se venden sin garantía.</p></div>
 </section>
 
 <section class="step">
@@ -165,12 +165,11 @@ var WHATSAPP = "5493426312752";
 var ALIASES = ["vexo.agencia.ar", "vexo.agencia.es"];
 var PRECIOS = {
   Seguidores: {
-    sin: [[500,2999],[1000,4999],[2500,9999],[5000,23999],[10000,46999]],
-    con: [[500,4999],[1000,6999],[2500,13999],[5000,27999],[10000,55999]]
+    sin: [[100,1000],[500,2800],[1000,5600],[2500,14000],[5000,28500],[10000,56000]],
+    con: [[100,2000],[500,5000],[1000,10000],[2500,24000],[5000,48000],[10000,98000]]
   },
   Likes: [[500,1999],[1000,2999],[2500,4999],[5000,6999]],
-  Vistas: [[10000,2999],[30000,7999],[50000,12999],[100000,19999]],
-  Promos: [[10000,49999],[30000,99999],[50000,139999],[75000,179999],[100000,249999]]
+  Vistas: [[10000,2999],[30000,7999],[50000,12999],[100000,19999]]
 };
 var PRECIOS_YT = {
   Suscriptores: [[500,34999],[1000,69999],[3000,209999],[5000,349999]],
@@ -182,7 +181,7 @@ var PRECIOS_YT = {
     3: [[500,9999],[1000,14999],[3000,29999],[5000,49999]]
   }
 };
-var MAS_VENDIDO = {Seguidores:1000, Likes:1000, Vistas:30000, Promos:30000};
+var MAS_VENDIDO = {Seguidores:1000, Likes:1000, Vistas:30000};
 /* ============================== */
 
 var st = {plat:"Instagram", serv:"Seguidores", gar:0, dur:1, pkg:null};
@@ -191,7 +190,7 @@ function durTxt(){ return st.dur===1 ? "1 hora" : st.dur + " horas"; }
 var $ = function(id){return document.getElementById(id)};
 var money = function(n){return "$" + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")};
 var qty = function(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")};
-var LINKS = {Seguidores:"Link de tu perfil", Likes:"Link de la publicación", Vistas:"Link del video o publicación", Promos:"Link de tu perfil", Suscriptores:"Link de tu canal"};
+var LINKS = {Seguidores:"Link de tu perfil", Likes:"Link de la publicación", Vistas:"Link del video o publicación", Suscriptores:"Link de tu canal"};
 LINKS[LIVE] = "Link de tu transmisión en vivo";
 var ICON = {
   Instagram:"<svg viewBox='0 0 24 24' fill='none' stroke='#fff' stroke-width='2' aria-hidden='true'><rect x='3' y='3' width='18' height='18' rx='5'/><circle cx='12' cy='12' r='4'/><circle cx='17.5' cy='6.5' r='1.1' fill='#fff' stroke='none'/></svg>",
@@ -200,7 +199,7 @@ var ICON = {
   Facebook:"<svg viewBox='0 0 24 24' fill='#fff' aria-hidden='true'><path d='M14 8V6.5c0-.7.2-1 1.1-1H17V2h-2.7C11.2 2 10 3.8 10 6.2V8H8v3.5h2V22h4V11.5h2.7L17 8h-3z'/></svg>"
 };
 
-function nm(){ return st.serv==="Promos" ? "seguidores" : st.serv.toLowerCase(); }
+function nm(){ return st.serv.toLowerCase(); }
 function list(){
   var p = st.plat==="YouTube" ? PRECIOS_YT[st.serv] : PRECIOS[st.serv];
   if(st.serv===LIVE) return p[st.dur];
@@ -214,8 +213,7 @@ function current(){
 }
 function servs(){
   if(st.plat==="YouTube") return ["Suscriptores","Likes","Vistas",LIVE];
-  if(st.plat==="TikTok") return ["Seguidores","Likes","Vistas"];
-  return ["Seguidores","Likes","Vistas","Promos"];
+  return ["Seguidores","Likes","Vistas"];
 }
 function renderPlats(){
   $("plats").innerHTML = ["Instagram","TikTok","Facebook","YouTube"].map(function(p){
@@ -223,6 +221,7 @@ function renderPlats(){
   }).join("");
 }
 function renderServs(){
+  $("servs").style.gridTemplateColumns = servs().length===3 ? "repeat(3,1fr)" : "repeat(2,1fr)";
   $("servs").innerHTML = servs().map(function(s){
     return '<button type="button" class="tab '+(st.serv===s?'on':'')+'" data-v="'+s+'">'+s+'</button>';
   }).join("");
@@ -230,7 +229,7 @@ function renderServs(){
 function renderPkgs(){
   $("gar").hidden = st.serv!=="Seguidores";
   $("dur").hidden = st.serv!==LIVE;
-  $("hint").textContent = st.serv===LIVE ? "Elegí por cuánto tiempo querés los espectadores. Este servicio no incluye garantía." : st.serv==="Promos" ? "Seguidores con garantía de 30 días incluida. Solo Instagram y Facebook." : st.serv==="Seguidores" ? "Con garantía (30 días) reponemos si bajan." : st.plat==="YouTube" ? "Este servicio no incluye garantía." : "Este servicio no incluye garantía. Precio igual para Instagram, TikTok y Facebook.";
+  $("hint").textContent = st.serv===LIVE ? "Elegí por cuánto tiempo querés los espectadores. Este servicio no incluye garantía." : st.serv==="Seguidores" ? "Con garantía (30 días) reponemos si bajan." : st.plat==="YouTube" ? "Este servicio no incluye garantía." : "Este servicio no incluye garantía. Precio igual para Instagram, TikTok y Facebook.";
   var lk = (st.plat==="YouTube" && (st.serv==="Likes" || st.serv==="Vistas")) ? "Link del video" : LINKS[st.serv];
   $("link").placeholder = esPerfil() ? "Pegá el link o escribí tu @usuario" : "Pegá el link acá";
   $("linkTitle").textContent = "4. " + lk + " de " + st.plat;
@@ -288,7 +287,7 @@ $("link").oninput = function(){ this.classList.remove("err"); $("msg").textConte
 function detalle(){
   var c = current();
   var s = qty(c[0]) + " " + nm();
-  if(st.serv===LIVE) s += " (por " + durTxt() + ")"; else if(st.serv==="Promos") s += " (promo, con garantía de 30 días)"; else if(st.serv==="Seguidores") s += st.gar ? " (con garantía de 30 días)" : " (sin garantía)";
+  if(st.serv===LIVE) s += " (por " + durTxt() + ")"; else if(st.serv==="Seguidores") s += st.gar ? " (con garantía de 30 días)" : " (sin garantía)";
   return s;
 }
 function normLink(v){
@@ -300,7 +299,7 @@ function normLink(v){
 }
 var DOM = {Instagram:["instagram.com","instagr.am"], TikTok:["tiktok.com"], Facebook:["facebook.com","fb.com","fb.watch","fb.me"], YouTube:["youtube.com","youtu.be"]};
 var EJ = {Instagram:"instagram.com/tuusuario", TikTok:"tiktok.com/@tuusuario", Facebook:"facebook.com/tupagina", YouTube:"youtube.com/@tucanal"};
-function esPerfil(){ return st.serv==="Seguidores" || st.serv==="Promos" || st.serv==="Suscriptores"; }
+function esPerfil(){ return st.serv==="Seguidores" || st.serv==="Suscriptores"; }
 function linkFrom(v){
   v = v.trim();
   if(/^@[\w.]+$/.test(v) && esPerfil()){

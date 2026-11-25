@@ -52,9 +52,15 @@ header{display:flex;justify-content:space-between;align-items:center;padding:18p
 .tag{position:absolute;top:-10px;right:10px;background:var(--grad);font:700 11px "DM Sans",sans-serif;padding:3px 9px;border-radius:99px}
 input[type=url]{width:100%;background:var(--surface);border:2px solid var(--line);border-radius:14px;color:var(--text);font:400 16px "DM Sans",sans-serif;padding:15px}
 input.err{border-color:#ff6b6b}
+.info{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:14px;color:var(--muted)}
+.info[hidden],.step h2 small:empty{display:none}
+.info p{margin:0 0 6px}
+.info p:last-child{margin:0}
+.info b{color:var(--text)}
 .msg{color:#ff8f8f;font-size:14px;min-height:20px;margin:6px 0 0}
 .notes{display:grid;gap:10px;margin-top:34px}
 .note{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.policy{margin-top:34px}
 .note h3{font-size:18px;margin-bottom:6px}
 .note p{margin:0;color:var(--muted);font-size:15px}
 details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:8px}
@@ -112,6 +118,11 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;word-break:break-all}
 <button type="button" data-g="0" class="on">Sin garantía</button>
 <button type="button" data-g="1">Con garantía (30 días)</button>
 </div>
+<div class="info" id="garInfo" hidden>
+<p>Hay dos tipos de seguidores:</p>
+<p><b>Sin garantía:</b> si ocurre una caída, no hacemos nada al respecto.</p>
+<p><b>Con garantía (30 días):</b> si tus seguidores bajan durante ese período, los reponemos sin costo adicional.</p>
+</div>
 <div class="toggle" id="dur" hidden>
 <button type="button" data-d="1" class="on">1 hora</button>
 <button type="button" data-d="2">2 horas</button>
@@ -127,17 +138,17 @@ dt{color:var(--muted)}dd{margin:0;text-align:right;word-break:break-all}
 </section>
 
 <section class="notes">
-<div class="note"><h3>Tiempos de entrega</h3><p>Lo normal es que tu pedido llegue en menos de 24 horas. En momentos de mucha demanda puede demorar hasta 72 horas. Si tenés dudas, escribinos por WhatsApp y te contamos cómo va.</p></div>
-<div class="note"><h3>Sin reembolsos</h3><p>Una vez realizado el pago no hacemos devoluciones. Revisá bien el link y el paquete antes de finalizar la compra.</p></div>
-<div class="note"><h3>Garantía en seguidores</h3><p>La garantía dura 30 días: si tus seguidores bajan durante ese período, los reponemos. Solo los seguidores se ofrecen con garantía; los suscriptores y espectadores en vivo de YouTube, los likes y las vistas se venden sin garantía.</p></div>
+<div class="note"><h3>Tiempos de entrega</h3><p>Tu pedido llega en menos de 24 horas. En momentos de mucha demanda puede demorar hasta 72 horas.</p></div>
 </section>
 
 <section class="step">
 <h2>Preguntas frecuentes</h2>
-<details><summary>¿Cómo pago?</summary><p>Por transferencia a cualquiera de nuestros alias: vexo.agencia.ar o vexo.agencia.es. Al finalizar la compra ves el total exacto y un botón para copiar cada alias.</p></details>
+<details><summary>¿Cómo pago?</summary><p>Los medios de pago son a través de transferencia bancaria, al finalizar la compra vas a ver el total exacto y un alias para transferir.</p></details>
 <details><summary>¿Necesitan mi contraseña?</summary><p>No. Solo necesitamos el link de tu perfil o publicación. Tu cuenta tiene que estar en modo público.</p></details>
 <details><summary>¿Cómo envío el comprobante?</summary><p>Al tocar “Enviar pedido por WhatsApp” se arma el mensaje con tu pedido. Después adjuntás el comprobante en ese mismo chat.</p></details>
 </section>
+
+<section class="note policy"><h3>Política de reembolsos</h3><p>Una vez realizado el pago no hacemos devoluciones.</p></section>
 
 <footer>© Vexo Agencia. Todos los derechos reservados.</footer>
 </div>
@@ -229,7 +240,8 @@ function renderServs(){
 function renderPkgs(){
   $("gar").hidden = st.serv!=="Seguidores";
   $("dur").hidden = st.serv!==LIVE;
-  $("hint").textContent = st.serv===LIVE ? "Elegí por cuánto tiempo querés los espectadores. Este servicio no incluye garantía." : st.serv==="Seguidores" ? "Con garantía (30 días) reponemos si bajan." : st.plat==="YouTube" ? "Este servicio no incluye garantía." : "Este servicio no incluye garantía. Precio igual para Instagram, TikTok y Facebook.";
+  $("garInfo").hidden = st.serv!=="Seguidores";
+  $("hint").textContent = st.serv===LIVE ? "Elegí por cuánto tiempo querés los espectadores. Este servicio no incluye garantía." : st.serv==="Seguidores" ? "" : st.plat==="YouTube" ? "Este servicio no incluye garantía." : "Este servicio no incluye garantía. Precio igual para Instagram, TikTok y Facebook.";
   var lk = (st.plat==="YouTube" && (st.serv==="Likes" || st.serv==="Vistas")) ? "Link del video" : LINKS[st.serv];
   $("link").placeholder = esPerfil() ? "Pegá el link o escribí tu @usuario" : "Pegá el link acá";
   $("linkTitle").textContent = "4. " + lk + " de " + st.plat;
